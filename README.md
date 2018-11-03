@@ -1,0 +1,1 @@
+# xframe-same-origin
