@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_name__",
+  "short_name": "__MSG_short_name__",
+  "description": "__MSG_description__",
+  "version": "0.0",
+  "default_locale": "en",
+  "icons": { "16": "img/16.png", "48": "img/48.png", "128": "img/128.png" },
+  "background": { "scripts": ["js/background.js"], "persistent": true },
+  "permissions": ["webRequest", "webRequestBlocking", "<all_urls>"],
+  "minimum_chrome_version": "60"
+}
