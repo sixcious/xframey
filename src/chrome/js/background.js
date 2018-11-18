@@ -28,9 +28,16 @@ var Background = (() => {
         if (headerName === "x-frame-options") {
           header.value = "SAMEORIGIN";
           console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
-        } else if (headerName === "content-security-policy" && headerValue.includes("frame-ancestors")) {
+        } else if (headerName === "content-security-policy") {
           // todo check frame-src and frame-ancestors and frame... who knows...
-          header.value = "self";
+          if (headerValue.includes("frame-ancestors")) {
+            header.value = header.value.replace("frame-ancestors 'none'", "frame-ancestors 'self'");
+            console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
+          }
+          if (headerValue.includes("frame-src")) {
+            // TODO
+            console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
+          }
         }
         return header;
       })
