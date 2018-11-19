@@ -8,11 +8,11 @@
 var Background = (() => {
 
   /**
-   * The chrome.webRequest.onHeadersReceived listener that is added if scroll TODO is enabled.
-   * Fired when HTTP response headers of a request have been received.
+   * A chrome.webRequest.onHeadersReceived listener that is fired when HTTP response headers of a request have been received.
    * Changes the HTTP Header X-Frame-Options value to SAME-ORIGIN to allow the use of embedded iframes on the page.
    * This is needed if a website sends a X-Frame-Options with a value of DENY or ALLOW-FROM.
    * X-Frame-Options: DENY, SAMEORIGIN, ALLOW-FROM https://example.com
+   * Content-Security-Policy: frame-ancestors 'none'; frame-src 'none';
    *
    * @param details object containing details of the headers received
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
@@ -23,21 +23,15 @@ var Background = (() => {
     return {
       responseHeaders: details.responseHeaders.map(header => {
         console.log("webRequestOnHeadersReceivedListener() - header:" + header.name + "=" + header.value);
-        const headerName = header.name.toLowerCase(),
-              headerValue = header.value.toLowerCase();
+        // TODO: Need to deal with ALLOW-FROM and CSP equivalent...
+        const headerName = header.name.toLowerCase();
         if (headerName === "x-frame-options") {
-          header.value = "SAMEORIGIN";
+          header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
           console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
         } else if (headerName === "content-security-policy") {
-          // todo check frame-src and frame-ancestors and frame... who knows...
-          if (headerValue.includes("frame-ancestors")) {
-            header.value = header.value.replace("frame-ancestors 'none'", "frame-ancestors 'self'");
-            console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
-          }
-          if (headerValue.includes("frame-src")) {
-            // TODO
-            console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
-          }
+          header.value = header.value.replace(/frame-ancestors 'none'/i, "frame-ancestors 'self'");
+          header.value = header.value.replace(/frame-src 'none'/i, "frame-src 'self'");
+          console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
         }
         return header;
       })
