@@ -33,8 +33,7 @@ var Background = (() => {
         const headerName = header.name.toLowerCase();
         // XFRAME: ALLOW-FROM not supported in Chrome, only in Firefox 18+ and may not take multiple URLs (unsure)
         if (headerName === "x-frame-options") {
-          //header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
-          header.value = "SAMEORIGIN";
+          header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
           console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
           // const values = header.value.split(/\s*/);
           // header.value = "";
