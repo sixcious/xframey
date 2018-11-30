@@ -5,7 +5,7 @@
   "description": "__MSG_description__",
   "version": "0.0",
   "default_locale": "en",
-  "icons": { "16": "img/16.png", "48": "img/48.png", "128": "img/128.png" },
+  "icons": { "16": "img/icon.png", "48": "img/icon.png", "128": "img/icon.png" },
   "background": { "scripts": ["js/background.js"], "persistent": true },
   "permissions": ["webRequest", "webRequestBlocking", "<all_urls>"],
   "minimum_chrome_version": "60"
