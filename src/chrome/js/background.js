@@ -1,11 +1,86 @@
 /**
- * X-Frame Same Origin
+ * X-Frame CSP Buster
  * @file background.js
  * @author Roy Six
  * @license LGPL-3.0
  */
 
 var Background = (() => {
+
+  // The storage default values. Note: Storage.set can only set top-level JSON objects, avoid using nested JSON objects (instead, prefix keys that should be grouped together with a label e.g. "auto")
+  const STORAGE_DEFAULT_VALUES = {
+    "mode":     "same-origin",
+    "headers":  ["x-frame-options", "content-security-policy"],
+    "policies": ["base-uri", "child-src", "connect-src", "default-src", "font-src", "form-action", "frame_ancestors", "frame-src", "img-src", "media-src", "object-src", "plugin-types", "report-uri", "sandbox", "script-src", "style-src"]
+  },
+
+  // The individual tab instances in Background memory. Note: We never save instances in storage
+  instances = new Map();
+
+  // The storage items cache in Background memory.
+  let items = {};
+
+  /**
+   * Gets the instance.
+   *
+   * @param tabId the tab id to lookup this instance by
+   * @returns instance the tab's instance
+   * @public
+   */
+  function getInstance(tabId) {
+    return instances.get(tabId);
+  }
+
+  /**
+   * TODO
+   *
+   * @param items_
+   */
+  function setItems(items_) {
+    items = items_;
+  }
+
+  /**
+   * Listen for installation changes and do storage/extension initialization work.
+   *
+   * @param details the installation details
+   * @private
+   */
+  async function installedListener(details) {
+    // Install: Open Options Page
+    if (details.reason === "install") {
+      console.log("installedListener() - details.reason=" + details.reason);
+      chrome.storage.local.set(STORAGE_DEFAULT_VALUES);
+    }
+    await startupListener();
+  }
+
+  /**
+   * The extension's background startup listener that is run the first time the extension starts.
+   * For example, when Chrome is started, when the extension is installed or updated, or when the
+   * extension is re-enabled after being disabled.
+   *
+   * @private
+   */
+  async function startupListener() {
+    console.log("startupListener()");
+    items = await Promisify.getItems();
+    // // Ensure the chosen toolbar icon is set. Firefox Android: chrome.browserAction.setIcon() not supported
+    // if (chrome.browserAction.setIcon && items && ["dark", "light", "confetti", "urli"].includes(items.iconColor)) {
+    //   console.log("startupListener() - setting browserAction icon to " + items.iconColor);
+    //   chrome.browserAction.setIcon({
+    //     path : {
+    //       "16": "/img/16-" + items.iconColor + ".png",
+    //       "24": "/img/24-" + items.iconColor + ".png",
+    //       "32": "/img/32-" + items.iconColor + ".png"
+    //     }
+    //   });
+    // }
+    // Firefox: Set badge text color to white always instead of using default color-contrasting introduced in FF 63
+    if (typeof browser !== "undefined" && browser.browserAction && browser.browserAction.setBadgeTextColor) {
+      browser.browserAction.setBadgeTextColor({color: "white"});
+    }
+  }
 
   /**
    * A chrome.webRequest.onHeadersReceived listener that is fired when HTTP response headers of a request have been received.
@@ -27,6 +102,7 @@ var Background = (() => {
    */
   function webRequestOnHeadersReceivedListener(details) {
     console.log("webRequestOnHeadersReceivedListener() - the chrome.webRequest.onHeadersReceived listener is on!");
+    const instance = {};
     return {
       responseHeaders: details.responseHeaders.map(header => {
         console.log("webRequestOnHeadersReceivedListener() - header:" + header.name + "=" + header.value);
@@ -35,26 +111,11 @@ var Background = (() => {
         if (headerName === "x-frame-options") {
           header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
           console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
-          // const values = header.value.split(/\s*/);
-          // header.value = "";
-          // let self = false;
-          // for (let value of values) {
-          //   const valuee = value.trim().toUpperCase();
-          //   if (valuee === "DENY") {
-          //     value = "";
-          //   } else if (valuee === "SAMEORIGIN") {
-          //     self = true;
-          //   }
-          // }
-          // if (!self) {
-          //   values.push("SAMEORIGIN");
-          // }
-          // header.value = values.filter(Boolean).join(" ");
         } else if (headerName === "content-security-policy") {
-          const csps = header.value.split(/;\s*/);
+          const policies = header.value.split(/;\s*/);
           header.value = "";
-          for (const csp of csps) {
-            const values = csp.split(/\s+/);
+          for (const policy of policies) {
+            const values = policy.split(/\s+/);
             const directive = values[0].trim().toLowerCase();
             console.log("directive=" + directive);
             if (directive.endsWith("-src") || directive === "frame-ancestors" || directive === "form-action") {
@@ -86,6 +147,14 @@ var Background = (() => {
   }
 
   // Background Listeners
+  chrome.runtime.onInstalled.addListener(installedListener);
+  chrome.runtime.onStartup.addListener(startupListener);
   chrome.webRequest.onHeadersReceived.addListener(webRequestOnHeadersReceivedListener, { urls: ["<all_urls>"], types: ["main_frame", "sub_frame"]}, ["blocking", "responseHeaders"]);
+
+  // Return Public Functions
+  return {
+    getInstance: getInstance,
+    setItems: setItems
+  };
 
 })();

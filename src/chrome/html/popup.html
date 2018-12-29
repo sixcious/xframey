@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>X-Frame CSP Buster</title>
+    <link rel="stylesheet" href="../lib/chromium.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/popup.css">
+    <script src="../js/promisify.js" defer></script>
+    <script src="../js/popup.js" defer></script>
+  </head>
+  <body>
+    <header id="name" data-i18n="textContent"></header>
+    <section id="mode">
+      <div class="heading">
+        <h3 id="mode-label" data-i18n="textContent"></h3>
+      </div>
+      <div id="mode-radios" class="radio">
+        <label>
+          <input id="mode-same-origin-input" type="radio" name="mode" value="same-origin">
+          <span id="mode-same-origin-label" data-i18n="textContent"></span>
+        </label>
+        <label>
+          <input id="mode-cross-origin-input" type="radio" name="mode" value="cross-origin">
+          <span id="mode-cross-origin-label" data-i18n="textContent"></span>
+        </label>
+        <label>
+          <input id="mode-no-action-input" type="radio" name="mode" value="no-action">
+          <span id="mode-no-action-label" data-i18n="textContent"></span>
+        </label>
+      </div>
+    </section>
+    <section id="headers">
+      <div class="heading">
+        <h3 id="headers-label" data-i18n="textContent"></h3>
+      </div>
+      <div id="headers-checkboxes">
+        <div class="checkbox">
+          <label>
+            <input id="x-frame-options-input" type="checkbox" value="x-frame-options">
+            <span id="x-frame-options-label" data-i18n="textContent"></span>
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="content-security-policy-input" type="checkbox" value="content-security-policy">
+            <span id="content-security-policy-label" data-i18n="textContent"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+    <section id="policies">
+      <div class="heading">
+        <h3 id="policies-label" data-i18n="textContent"></h3>
+      </div>
+      <div id="policies-checkboxes">
+        <div class="checkbox">
+          <label>
+            <input id="base-uri-input" type="checkbox" value="base-uri">
+            <span id="base-uri-label" data-i18n="textContent"></span>
+          </label>
+          
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="child-src-input" type="checkbox" value="child-src">
+            <span id="child-src-label" data-i18n="textContent"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+    <section id="instance">
+
+    </section>
+  </body>
+</html>

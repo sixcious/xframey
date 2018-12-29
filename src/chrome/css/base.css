@@ -1,0 +1,161 @@
+/**
+ * URL Incrementer
+ * @file base.css
+ * @author Roy Six
+ * @license LGPL-3.0
+ */
+
+/* Variables */
+
+:root {
+  --increment-decrement-color: #1779BA;
+  --increment-decrement-m-color: #4AACED;
+  --increment-decrement-1-color: #1779BA;
+  --increment-decrement-2-color: #004687;
+  --increment-decrement-3-color: #001354;
+  --next-prev-color: #05854D;
+  --clear-color: #FF0000;
+  --return-to-start-color: #FFCC22;
+  --enhanced-mode-color: #EEBB22;
+  --auto-color: #FF6600;
+  --download-color: rebeccapurple; /* #663399 */
+  --toolkit-color: #000028;
+  --error-skip-color: #000000;
+  --saved-urls-color: #FF69B4;
+  --shuffle-color: #BA1F40;
+  --success-color: #05854D;
+  --error-color: #E6003E;
+  --info-color: #999999;
+  --default-color: #333333;
+}
+
+/* Native */
+
+img {
+  vertical-align: text-bottom;
+}
+
+h3 {
+  color: inherit;
+  font-weight: inherit;
+  display: inline;
+  user-select: initial;
+}
+
+/* Classes */
+
+.display-block {
+  display: block;
+}
+
+.display-none {
+  display: none;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.clear-both {
+  clear: both;
+}
+
+.table {
+  display: table;
+}
+
+.row {
+  display: table-row;
+}
+
+.column {
+  display: table-cell;
+}
+
+/* Fade */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fade-in-max-height {
+  from { max-height: 0; }
+  to { max-height: 1000px; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0); }
+}
+
+@keyframes fade-out-max-height {
+  from { max-height: 1000px; }
+  to { max-height: 0; }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out, fade-in-max-height 0.6s ease-out;
+}
+
+.fade-out {
+  animation: fade-out 0.3s ease-out, fade-out-max-height 0.3s ease-out;
+}
+
+/* Generate Alert */
+/* Generates an alert box (e.g. to show error messages) using an overlay */
+/* Derived from the sample Google extension, Proxy Settings by Mike West */
+
+.overlay {
+  display: block;
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  padding: 10px;
+  margin: -40px 0 0 -120px;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
+  color: #FFFFFF;
+  font-size: 1.2em;
+  transition: all 1.0s ease;
+  transform: scale(0);
+}
+
+.overlay ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.overlay ul li {
+  text-align: center;
+}
+
+.overlay-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Firefox */
+
+/* Firefox: input[type=number] Change input type number to hide spinner up/down arrows unless focused/hovered */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]:hover, input[type="number"]:focus {
+  -moz-appearance: initial;
+}
+
+/* Firefox: textarea Add font: inherit (no browser defaults for options like Chrome) and overflow-x: hidden; because Moz adds extra height to textarea (for scrollbars) */
+textarea {
+  font: inherit;
+  overflow-x: hidden;
+}

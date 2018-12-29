@@ -1,0 +1,142 @@
+/**
+ * URL Incrementer
+ * @file popup.css
+ * @author Roy Six
+ * @license LGPL-3.0
+ */
+
+/* Native */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #FFFFFF;
+  color: #333333;
+  width: 512px;
+  margin: 12px;
+}
+
+header {
+  font-size: 140%;
+  font-weight: bold;
+  font-style: italic;
+}
+
+header, section:not(last-child) {
+  margin-bottom: 16px;
+}
+
+div.checkbox img {
+  margin-left: 3px;
+}
+
+/* Tables (CSS derived from ZURB Foundation) */
+
+table {
+  border-collapse: collapse;
+  border-radius: 0;
+  margin-bottom: 1rem;
+  max-width: 512px;
+  max-height: 226px;
+  display: block;
+  overflow: auto;
+  word-break: break-all;
+}
+
+table thead, table tbody {
+  border: 1px solid #f1f1f1;
+  background-color: #fefefe;
+}
+
+table thead {
+  background: #f8f8f8;
+  color: #0a0a0a;
+}
+
+table thead tr {
+  background: transparent;
+}
+
+table thead tr th {
+  font-weight: bold;
+  text-align: left;
+}
+
+table thead th, table tbody th, table tbody td {
+  padding: 0.25rem 0.312rem 0.312rem;
+}
+
+table tbody tr:nth-child(even) {
+  border-bottom: 0;
+  background-color: #f1f1f1;
+}
+
+table tr:nth-of-type(even):hover {
+  background-color: #ececec;
+}
+
+table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.heading {
+  font-weight: bold;
+  padding-bottom: 2px;
+  margin-bottom: 0.6em;
+  color: #333333;
+  border-bottom: 1px solid #333333;
+  position: relative; /* Firefox Android: for heading-right position absolute to stay inside setup container width */
+}
+
+.heading-right {
+  font-style: italic;
+  font-size: 0.9em;
+  position: absolute;
+  right: 0;
+  margin-top: -16px;
+}
+
+.heading-right img {
+  margin-bottom: 1px;
+}
+
+.heading-right .icon-button img {
+  margin-bottom: 2px;
+}
+
+#setup input[type="number"] {
+  width: 52px;
+  display: block;
+}
+
+#setup select {
+  display: block;
+}
+
+#setup textarea {
+  word-break: break-all;
+  resize: vertical;
+  width: 512px;
+  min-height: 41px;
+  max-height: 100px;
+}
+
+#setup img {
+  user-select: none;
+}
+
+#setup div.column {
+  padding-top: 7px;
+}
+
+#setup div.column > label, label.label-display-block {
+  display: block;
+  margin-bottom: 2px;
+}
+
+#setup div.column label.label-display-inline-block {
+  display: inline-block;
+}
