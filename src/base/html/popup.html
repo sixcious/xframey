@@ -1,76 +1,108 @@
+<!--
+ - Xframey
+ - @copyright (c) 2020 Roy Six
+ - @license https://github.com/sixcious/xframey/blob/main/LICENSE
+ -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>X-Frame CSP Buster</title>
-    <link rel="stylesheet" href="../lib/chromium.css">
-    <link rel="stylesheet" href="../css/base.css">
+    <title>Xframey Popup</title>
+    <link rel="stylesheet" href="../lib/material/material-components-web.min.css">
+    <link rel="stylesheet" href="../lib/balloon/balloon.min.css">
+    <link rel="stylesheet" href="../lib/hover/hover.css">
+    <link rel="stylesheet" href="../css/ui.css">
     <link rel="stylesheet" href="../css/popup.css">
-    <script src="../js/promisify.js" defer></script>
-    <script src="../js/popup.js" defer></script>
+    <script defer src="../lib/material/material-components-web.min.js"></script>
+    <script defer src="../js/mdc.js"></script>
+    <script defer src="../js/ui.js"></script>
+    <script defer src="../js/promisify.js"></script>
+    <script defer src="../js/popup.js"></script>
   </head>
-  <body>
-    <header id="name" data-i18n="textContent"></header>
-    <section id="mode">
-      <div class="heading">
-        <h3 id="mode-label" data-i18n="textContent"></h3>
-      </div>
-      <div id="mode-radios" class="radio">
-        <label>
-          <input id="mode-same-origin-input" type="radio" name="mode" value="same-origin">
-          <span id="mode-same-origin-label" data-i18n="textContent"></span>
-        </label>
-        <label>
-          <input id="mode-cross-origin-input" type="radio" name="mode" value="cross-origin">
-          <span id="mode-cross-origin-label" data-i18n="textContent"></span>
-        </label>
-        <label>
-          <input id="mode-no-action-input" type="radio" name="mode" value="no-action">
-          <span id="mode-no-action-label" data-i18n="textContent"></span>
-        </label>
-      </div>
-    </section>
-    <section id="headers">
-      <div class="heading">
-        <h3 id="headers-label" data-i18n="textContent"></h3>
-      </div>
-      <div id="headers-checkboxes">
-        <div class="checkbox">
+  <body id="popup">
+    <div id="setup">
+      <header id="name" data-i18n="textContent"></header>
+      <section id="mode">
+        <div class="heading">
+          <h3 id="mode-label" data-i18n="textContent"></h3>
+        </div>
+        <div id="mode-radios" class="radio">
           <label>
-            <input id="x-frame-options-input" type="checkbox" value="x-frame-options">
-            <span id="x-frame-options-label" data-i18n="textContent"></span>
+            <input id="mode-same-origin-input" type="radio" name="mode" value="same-origin">
+            <span id="mode-same-origin-label" data-i18n="textContent"></span>
+          </label>
+          <label>
+            <input id="mode-cross-origin-input" type="radio" name="mode" value="cross-origin">
+            <span id="mode-cross-origin-label" data-i18n="textContent"></span>
+          </label>
+          <label>
+            <input id="mode-no-action-input" type="radio" name="mode" value="no-action">
+            <span id="mode-no-action-label" data-i18n="textContent"></span>
           </label>
         </div>
-        <div class="checkbox">
-          <label>
-            <input id="content-security-policy-input" type="checkbox" value="content-security-policy">
-            <span id="content-security-policy-label" data-i18n="textContent"></span>
-          </label>
+      </section>
+      <section id="headers">
+        <div class="heading">
+          <h3 id="headers-label" data-i18n="textContent"></h3>
         </div>
-      </div>
-    </section>
-    <section id="policies">
-      <div class="heading">
-        <h3 id="policies-label" data-i18n="textContent"></h3>
-      </div>
-      <div id="policies-checkboxes">
-        <div class="checkbox">
-          <label>
-            <input id="base-uri-input" type="checkbox" value="base-uri">
-            <span id="base-uri-label" data-i18n="textContent"></span>
-          </label>
-          
+        <div id="headers-checkboxes">
+          <div class="checkbox">
+            <label>
+              <input id="x-frame-options-input" type="checkbox" value="x-frame-options">
+              <span id="x-frame-options-label" data-i18n="textContent"></span>
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input id="content-security-policy-input" type="checkbox" value="content-security-policy">
+              <span id="content-security-policy-label" data-i18n="textContent"></span>
+            </label>
+          </div>
         </div>
-        <div class="checkbox">
-          <label>
-            <input id="child-src-input" type="checkbox" value="child-src">
-            <span id="child-src-label" data-i18n="textContent"></span>
-          </label>
+      </section>
+      <section id="policies">
+        <div class="heading">
+          <h3 id="policies-label" data-i18n="textContent"></h3>
         </div>
-      </div>
-    </section>
-    <section id="instance">
+        <div id="policies-checkboxes">
+          <div class="checkbox">
+            <label>
+              <input id="base-uri-input" type="checkbox" value="base-uri">
+              <span id="base-uri-label" data-i18n="textContent"></span>
+            </label>
 
-    </section>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input id="child-src-input" type="checkbox" value="child-src">
+              <span id="child-src-label" data-i18n="textContent"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section id="instance">
+      </section>
+      <div id="headers-data-table" class="mdc-data-table">
+        <table class="mdc-data-table__table" aria-label="Headers">
+          <thead>
+            <tr class="mdc-data-table__header-row">
+              <th class="mdc-data-table__header-cell" role="columnheader" scope="col" data-id="table-heading-header-name" data-i18n="textContent"></th>
+              <th class="mdc-data-table__header-cell" role="columnheader" scope="col" data-id="table-heading-header-value" data-i18n="textContent"></th>
+              <th class="mdc-data-table__header-cell" role="columnheader" scope="col" data-id="table-heading-header-change" data-i18n="textContent"></th>
+            </tr>
+          </thead>
+          <tbody id="headers-tbody" class="mdc-data-table__content">
+          </tbody>
+        </table>
+        <template id="headers-tr-template">
+          <tr data-row-id="" class="mdc-data-table__row">
+            <td class="mdc-data-table__cell"></td>
+            <td class="mdc-data-table__cell"></td>
+            <td class="mdc-data-table__cell"></td>
+          </tr>
+        </template>
+      </div>
+    </div>
+    <div id="messages"></div>
   </body>
 </html>

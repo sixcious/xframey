@@ -1,44 +1,94 @@
 /**
- * X-Frame CSP Buster
- * @file background.js
- * @author Roy Six
- * @license LGPL-3.0
+ * Xframey
+ * @copyright (c) 2020 Roy Six
+ * @license https://github.com/sixcious/xframey/blob/main/LICENSE
  */
 
-var Background = (() => {
-
-  // The storage default values. Note: Storage.set can only set top-level JSON objects, avoid using nested JSON objects (instead, prefix keys that should be grouped together with a label e.g. "auto")
-  const STORAGE_DEFAULT_VALUES = {
-    "mode":     "same-origin",
-    "headers":  ["x-frame-options", "content-security-policy"],
-    "policies": ["base-uri", "child-src", "connect-src", "default-src", "font-src", "form-action", "frame_ancestors", "frame-src", "img-src", "media-src", "object-src", "plugin-types", "report-uri", "sandbox", "script-src", "style-src"]
-  },
-
-  // The individual tab instances in Background memory. Note: We never save instances in storage
-  instances = new Map();
-
-  // The storage items cache in Background memory.
-  let items = {};
+/**
+ * Background handles all extension-specific background tasks, such as installation and update events, listeners, and
+ * supporting chrome.* apis that are only available in the background (such as commands or setting the toolbar icon).
+ *
+ * Since the extension is designed to primarily be a content script based extension, and because this extension does not
+ * have a persistent background, there is little logic contained here, and there is no "state" (objects in memory).
+ *
+ * @see MV2 Example https://stackoverflow.com/questions/67915399/as-of-chrome-90-cant-modify-response-header-for-x-frame-options
+ * @see MV3 Example https://stackoverflow.com/questions/15532791/getting-around-x-frame-options-deny-in-a-chrome-extension/69177790#69177790
+ */
+const Background = (() => {
 
   /**
-   * Gets the instance.
+   * Variables
    *
-   * @param tabId the tab id to lookup this instance by
-   * @returns instance the tab's instance
-   * @public
+   * @param ID_CHROME  the chrome extension id (used to help determine what browser this is)
+   * @param ID_EDGE    the edge extension id (used to help determine what browser this is)
+   * @param ID_FIREFOX the firefox extension id (used to help determine what browser this is)
    */
-  function getInstance(tabId) {
-    return instances.get(tabId);
+  const ID_CHROME = "";
+  const ID_EDGE = "";
+  const ID_FIREFOX = "xframey@webextensions";
+
+  let items= {};
+
+  /**
+   * Gets the storage default values (SDV) of the extension.
+   *
+   * Note: Storage.set can only set top-level JSON objects, avoid using nested JSON objects.
+   * Instead, prefix keys that should be grouped together with a label e.g. "auto"
+   *
+   * @returns {*} the storage default values object
+   * @private
+   */
+  function getStorageDefaultValues() {
+    console.log("getStorageDefaultValues()");
+    return {
+      "installVersion": chrome.runtime.getManifest().version, "installDate": new Date().toJSON(), "browserName": getBrowserName(), "firstRun": true, "on": true,
+      "toolbarIcon": getPreferredColor(), "buttonSize": 50, "interfaceTheme": false, "interfaceMessages": true, "dynamicSettings": true,
+      "mode": "same-origin",
+      "headers": ["x-frame-options", "content-security-policy"],
+      "instances": []
+    };
   }
 
   /**
-   * TODO
+   * Gets this browser's name by examining this extension's ID or by inspecting the navigator.userAgent object.
    *
-   * @param items_
+   * @returns {string} the browser's name in all lowercase letters: "chrome", "edge", "firefox"
+   * @private
    */
-  function setItems(items_) {
-    items = items_;
+  function getBrowserName() {
+    const chromeName = "chrome";
+    const edgeName = "edge";
+    const firefoxName = "firefox";
+    // chrome.runtime.id
+    const ID = typeof chrome !== "undefined" && chrome && chrome.runtime && chrome.runtime.id ? chrome.runtime.id : "";
+    let browserName = ID === ID_CHROME ? chromeName : ID === ID_EDGE ? edgeName : ID === ID_FIREFOX ? firefoxName : "";
+    let method = "chrome.runtime.id:" + ID;
+    // navigator.userAgent
+    if (!browserName) {
+      const UA = typeof navigator !== "undefined" && navigator && navigator.userAgent ? navigator.userAgent : "";
+      browserName = UA.includes("Firefox/") ? firefoxName : UA.includes("Edg/") ? edgeName : chromeName;
+      method = "navigator.userAgent:" + UA;
+    }
+    console.log("getBrowserName() - browserName=" + browserName + ", method=" + method);
+    return browserName;
   }
+
+  /**
+   * Gets the user's preferred icon color. Note this is actually the opposite of what prefers-color-scheme returns.
+   * If the preferred color scheme is dark, this returns light and vice versa.
+   *
+   * @returns {string} the preferred icon color, either "dark" or "light"
+   * @private
+   */
+  function getPreferredColor() {
+    let color = "dark";
+    if (typeof window !== "undefined" && window.matchMedia) {
+      color = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark";
+    }
+    console.log("getPreferredColor() - color=" +  color);
+    return color;
+  }
+
 
   /**
    * Listen for installation changes and do storage/extension initialization work.
@@ -47,12 +97,19 @@ var Background = (() => {
    * @private
    */
   async function installedListener(details) {
-    // Install: Open Options Page
+    console.log("installedListener() - details=" + JSON.stringify(details));
+    const SDV = getStorageDefaultValues();
+    // Install:
     if (details.reason === "install") {
-      console.log("installedListener() - details.reason=" + details.reason);
-      chrome.storage.local.set(STORAGE_DEFAULT_VALUES);
+      console.log("installedListener() - installing ...");
+      await Promisify.storageClear();
+      await Promisify.storageSet(SDV);
+      // chrome.runtime.openOptionsPage();
     }
-    await startupListener();
+    // // Update:
+    // else if (details.reason === "update") {
+    // }
+    startupListener();
   }
 
   /**
@@ -64,21 +121,21 @@ var Background = (() => {
    */
   async function startupListener() {
     console.log("startupListener()");
-    items = await Promisify.getItems();
-    // // Ensure the chosen toolbar icon is set. Firefox Android: chrome.browserAction.setIcon() not supported
-    // if (chrome.browserAction.setIcon && items && ["dark", "light", "confetti", "urli"].includes(items.iconColor)) {
-    //   console.log("startupListener() - setting browserAction icon to " + items.iconColor);
-    //   chrome.browserAction.setIcon({
-    //     path : {
-    //       "16": "/img/16-" + items.iconColor + ".png",
-    //       "24": "/img/24-" + items.iconColor + ".png",
-    //       "32": "/img/32-" + items.iconColor + ".png"
-    //     }
-    //   });
-    // }
+    items = await Promisify.storageGet();
+    // Ensure the chosen toolbar icon is set. Firefox Android: chrome.action.setIcon() not supported
+    if (chrome.action.setIcon && items && ["dark", "light"].includes(items.toolbarIcon)) {
+      console.log("startupListener() - setting action icon to " + items.toolbarIcon);
+      chrome.action.setIcon({
+        path : {
+          "16": "/img/icon-" + items.toolbarIcon + ".png",
+          "24": "/img/icon-" + items.toolbarIcon + ".png",
+          "32": "/img/icon-" + items.toolbarIcon + ".png"
+        }
+      });
+    }
     // Firefox: Set badge text color to white always instead of using default color-contrasting introduced in FF 63
-    if (typeof browser !== "undefined" && browser.browserAction && browser.browserAction.setBadgeTextColor) {
-      browser.browserAction.setBadgeTextColor({color: "white"});
+    if (typeof browser !== "undefined" && browser.action && browser.action.setBadgeTextColor) {
+      browser.action.setBadgeTextColor({color: "white"});
     }
   }
 
@@ -95,6 +152,8 @@ var Background = (() => {
    * default-src, script-src, style-src, img-src, connect-src, font-src, object-src, media-src, frame-src, child-src,
    * sandbox, report-uri, form-action, frame-ancestors, plugin-types
    *
+   * Important: This function CANNOT be async or it will fail to work.
+   *
    * @param details object containing details of the headers received
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
    * @see https://content-security-policy.com
@@ -102,59 +161,117 @@ var Background = (() => {
    */
   function webRequestOnHeadersReceivedListener(details) {
     console.log("webRequestOnHeadersReceivedListener() - the chrome.webRequest.onHeadersReceived listener is on!");
-    const instance = {};
-    return {
-      responseHeaders: details.responseHeaders.map(header => {
-        console.log("webRequestOnHeadersReceivedListener() - header:" + header.name + "=" + header.value);
-        const headerName = header.name.toLowerCase();
-        // XFRAME: ALLOW-FROM not supported in Chrome, only in Firefox 18+ and may not take multiple URLs (unsure)
-        if (headerName === "x-frame-options") {
-          header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
-          console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
-        } else if (headerName === "content-security-policy") {
-          const policies = header.value.split(/;\s*/);
-          header.value = "";
-          for (const policy of policies) {
-            const values = policy.split(/\s+/);
-            const directive = values[0].trim().toLowerCase();
-            console.log("directive=" + directive);
-            if (directive.endsWith("-src") || directive === "frame-ancestors" || directive === "form-action") {
-              let self = false;
-              for (let i = 1; i < values.length; i++) {
-                const value = values[i].trim().toLowerCase();
-                console.log("value=" + value);
-                if (value === "'self'") {
-                  self = true;
-                } else if (value === "'none'") {
-                  values[i] = '';
-                }
-              }
-              if (!self) {
-                values.push("'self'");
-              }
-            }
-            // Note: filter(Boolean) removes empty values e.g. if we replaced 'none' with ''
-            header.value += values.filter(Boolean).join(" ") + "; ";
-          }
-          console.log("header.value=");
-          console.log(header.value);
+    const mode = items && items.mode ? items.mode : "OFF";
+    const records = [];
+    const headers = details.responseHeaders;
+    for (let header of headers) {
+      console.log("webRequestOnHeadersReceivedListener() - pre:" + header.name + "=" + header.value);
+      const headerName = header.name.toLowerCase();
+      const headerValue = header.value;
+      if (headerName === "x-frame-options") {
+        header.value = xFrameOptions(header, mode);
+      } else if (headerName === "content-security-policy") {
+        header.value = contentSecurityPolicy(header, mode);
+      }
+      const record = {};
+      record.name = header.name;
+      record.value = header.value;
+      record.changed = header.value !== headerValue;
+      if (record.changed) {
+        record.oldValue = headerValue;
+      }
+      records.push(record);
+      console.log("webRequestOnHeadersReceivedListener() - pos:" + header.name + "=" + header.value);
+    }
+    // Sort by
+    records.sort((a, b) => a.name > b.name ? 1 : -1);
+    // const tabs = await Promisify.tabsQuery();
+    chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+      const instances = items.instances.filter(instance => instance.tabId !== tabs[0].id);
+      const instance = {};
+      instance.tabId = tabs[0].id;
+      instance.headers = records;
+      instances.push(instance);
+      console.log("instances=");
+      console.log(instances);
+      Promisify.storageSet({"instances": instances});
+    });
+    return { responseHeaders: headers };
+  }
 
-          console.log("webRequestOnHeadersReceivedListener() - changed:" + header.name + "=" + header.value);
+  // XFRAME: ALLOW-FROM not supported in Chrome, only in Firefox 18+ and may not take multiple URLs (unsure)
+  function xFrameOptions(header, mode) {
+    console.log("xframeOptions() - header.name=" + header.name + ", mode=" + mode);
+    if (mode === "same-origin") {
+      header.value = header.value.replace(/DENY/i, "SAMEORIGIN");
+    } else if (mode === "cross-origin") {
+      header.value = "";
+    }
+    return header.value;
+  }
+
+  //https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+  function contentSecurityPolicy(header, mode) {
+    console.log("contentSecurityPolicy() - header.name=" + header.name + ", header.value=" + header.value + ", mode=" + mode);
+    // Note: I Totally missed "frame-ancestors" pre 2022; that was why it was failing on Xframey Problem URLs!
+    const directives = ["base-uri", "child-src", "connect-src", "default-src", "font-src", "form-action", "frame-ancestors", "frame_ancestors", "frame-src", "img-src", "media-src", "object-src", "plugin-types", "report-uri", "sandbox", "script-src", "style-src"];
+    const policies = header.value.split(/;\s*/);
+    header.value = "";
+    for (const policy of policies) {
+      const values = policy.split(/\s+/);
+      const directive = values[0].trim().toLowerCase();
+      console.log("contentSecurityPolicy() - directive=" + directive);
+      if (directives.includes(directive)) {
+        let self = false;
+        for (let i = 1; i < values.length; i++) {
+          const value = values[i].trim().toLowerCase();
+          console.log("contentSecurityPolicy() - value=" + value);
+          if (value === "'self'") {
+            console.log("got a self");
+            self = true;
+          } else if (value === "'none'") {
+            console.log("got a none");
+            values[i] = '';
+          }
         }
-        return header;
-      })
-    };
+        if (!self) {
+          values.push("'self'");
+        }
+      }
+      // Note: filter(Boolean) removes empty values e.g. if we replaced 'none' with ''
+      header.value += values.filter(Boolean).join(" ") + "; ";
+    }
+    console.log("contentSecurityPolicy() - after changes, header.value=" + header.value);
+    return header.value;
   }
 
   // Background Listeners
   chrome.runtime.onInstalled.addListener(installedListener);
   chrome.runtime.onStartup.addListener(startupListener);
-  chrome.webRequest.onHeadersReceived.addListener(webRequestOnHeadersReceivedListener, { urls: ["<all_urls>"], types: ["main_frame", "sub_frame"]}, ["blocking", "responseHeaders"]);
 
-  // Return Public Functions
-  return {
-    getInstance: getInstance,
-    setItems: setItems
-  };
+
+  // MV2 Version Code:
+  // chrome.webRequest.onHeadersReceived.addListener(webRequestOnHeadersReceivedListener, { urls: ["<all_urls>"], types: ["main_frame", "sub_frame"]}, ["blocking", "responseHeaders", "extraHeaders"]);
+  chrome.webRequest.onHeadersReceived.addListener(webRequestOnHeadersReceivedListener, { urls: ["<all_urls>"] }, ["blocking", "responseHeaders", "extraHeaders"]);
+
+  //MV3 Version Code:
+  // const rule = {
+  //   id: 1,
+  //   priority: 1,
+  //   action: { type: "modifyHeaders", responseHeaders: [
+  //     { header: "X-FRAME-OPTIONS", operation: "set", value: "SAME-ORIGIN" },
+  //     // { header: "CONTENT-SECURITY-POLICY", operation: "remove" }
+  //     ] },
+  //   condition: { resourceTypes: ["sub_frame"] }
+  // };
+  // chrome.declarativeNetRequest.updateDynamicRules({
+  //   removeRuleIds: [rule.id],
+  //   addRules: [rule]
+  // });
+
+  // MV3 / MV2 convenience code
+  if (!chrome.action) {
+    chrome.action = chrome.browserAction;
+  }
 
 })();

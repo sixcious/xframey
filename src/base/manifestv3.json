@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_name__",
+  "short_name": "__MSG_short_name__",
+  "description": "__MSG_description__",
+  "version": "0.1",
+  "default_locale": "en",
+  "icons": { "16": "img/icon.png", "48": "img/icon.png", "128": "img/icon.png" },
+  "action": { "default_title": "__MSG_title__", "default_icon": { "16": "img/icon.png", "24": "img/icon.png", "32": "img/icon.png" }, "default_popup": "html/popup.html" },
+  "background": { "service_worker": "js/worker.js" },
+  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": ["<all_urls>"],
+  "minimum_chrome_version": "102"
+}

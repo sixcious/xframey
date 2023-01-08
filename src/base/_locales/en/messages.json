@@ -1,8 +1,8 @@
 {
-  "name": { "message": "X-Frame CSP Buster" },
-  "short_name": { "message": "X-Frame CSP Buster" },
-  "description": { "message": "TODO Description." },
-  "title": { "message": "TODO Title" },
+  "name": { "message": "Xframey" },
+  "short_name": { "message": "Xframey" },
+  "description": { "message": "Enable Iframes on websites and alter their X-Frame Options. (Beta)" },
+  "title": { "message": "Xframey" },
 
   "mode_label": { "message": "Mode" },
   "mode_same_origin_label": { "message": "Same Origin" },
@@ -27,5 +27,8 @@
   "report_uri_label": { "message": "report-uri" },
   "sandbox_label": { "message": "sandbox" },
   "script_src_label": { "message": "script-src" },
-  "style_src_label": { "message": "style-src" }
-}
+  "style_src_label": { "message": "style-src" },
+
+  "table_heading_header_name": { "message": "Name" },
+  "table_heading_header_value": { "message": "Value" },
+  "table_heading_header_change": { "message": "Change" }}
