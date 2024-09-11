@@ -1,7 +1,7 @@
 # Xframey
-Xframey is an extension in beta that allows iframes to be inserted into a web page. It sets the `X-Frame-Options` header to `SAME ORIGIN` and `Content-Security-Policy` headers to `'self'`, overriding any potential `DENY` values set by the server.
+Xframey allows iframes to be inserted into a web page. By default, it sets the `X-Frame-Options` header to `SAME ORIGIN` and `Content-Security-Policy` headers to `'self'`, overriding any potential `DENY` values set by the server. This is a much safer way of allowing same-origin iframes to be inserted compared to the conventional approach other apps/extensions use (which outright remove the headers, allowing cross-origin iframes to be inserted from other domains!).
 
-This is useful for extensions that wish to allow websites to frame themselves (like [Infy Scroll](https://github.com/sixcious/infy-scroll)), and is a relatively safer alternative as compared to allowing cross-origins.
+This is useful for apps or extensions that only wish to allow websites to frame themselves, like [Infy Scroll](https://github.com/sixcious/infy-scroll).
 
 ## Installation
 Installing from GitHub is super simple. First, [download the zip](https://github.com/sixcious/xframey/archive/refs/heads/main.zip) and unzip it. Then:
