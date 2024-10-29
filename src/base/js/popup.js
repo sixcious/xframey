@@ -69,7 +69,7 @@ var Popup = (() => {
     console.log("items=");
     console.log(items);
     // instance = items.instances[tabs[0].id];
-    instance = items.instances.find(instance => instance.tabId === tabs[0].id);
+    instance = items.instances?.find(instance => instance.tabId === tabs[0].id);
     console.log("instance=");
     console.log(instance);
     // backgroundPage = await Promisify.getBackgroundPage();
@@ -84,11 +84,11 @@ var Popup = (() => {
     DOM["#mode-same-origin-input"].checked = items.mode === "same-origin";
     DOM["#mode-cross-origin-input"].checked = items.mode === "cross-origin";
     DOM["#mode-no-action-input"].checked = items.mode === "no-action";
-    DOM["#x-frame-options-input"].checked = items.headers.includes("x-frame-options");
+    DOM["#x-frame-options-input"].checked = items.headers?.includes("x-frame-options");
     DOM["#content-security-policy-input"].checked = items.headers.includes("content-security-policy");
-    DOM["#policies"].className = items.headers.includes("content-security-policy") ? "display-block" : "display-none";
-    DOM["#base-uri-input"].checked = items.policies.includes("base-uri");
-    DOM["#child-src-input"].checked = items.policies.includes("child-src");
+    DOM["#policies"].className = items.headers?.includes("content-security-policy") ? "display-block" : "display-none";
+    DOM["#base-uri-input"].checked = items.policies?.includes("base-uri");
+    DOM["#child-src-input"].checked = items.policies?.includes("child-src");
 
     //DOM["#instance"].textContent = JSON.stringify(instance);
 
