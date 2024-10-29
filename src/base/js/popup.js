@@ -93,12 +93,12 @@ var Popup = (() => {
     //DOM["#instance"].textContent = JSON.stringify(instance);
 
 
-    const headers = instance.headers;
+    const headers = instance?.headers;
     const tbody = DOM["#headers-tbody"];
     const template = DOM["#headers-tr-template"];
     const trs = [];
     console.log("instance.headers=");
-    console.log(instance.headers);
+    console.log(headers);
     if (headers && headers.length > 0) {
       for (const header of headers) {
         const tr = template.content.children[0].cloneNode(true);
