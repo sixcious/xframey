@@ -12,7 +12,7 @@ Installing from GitHub is super simple. First, [download the zip](https://github
 #### Firefox
 - [Follow these instructions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension#installing) to load a Temporary Add-on
 
-**Finally**: When prompted for the location, select the `src/base` folder (Firefox: select `manifest.json`) and it will install.
+**Finally**: When prompted for the location, select the `src` folder (Firefox: select `manifest.json`) and it will install.
 
 **Important**: There is no version update path for the GitHub build.
 
