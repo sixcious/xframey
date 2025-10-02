@@ -1,6 +1,6 @@
 /**
  * Xframey
- * @copyright (c) 2020 Roy Six
+ * @copyright (c) 2020 Six
  * @license https://github.com/sixcious/xframey/blob/main/LICENSE
  */
 
