@@ -4,7 +4,7 @@ Xframey allows iframes to be inserted into a web page. By default, it sets the `
 This is useful for apps or extensions that only wish to allow websites to frame themselves, like [Infy Scroll](https://github.com/sixcious/infy-scroll).
 
 ## Important Note
-Xframey is built using Manifest V2 and some browsers, like Chrome, no longer support MV2. If your browser doesn't support MV2, please try using an alternative listed on the bottom or from your web store instead.
+Xframey was built using Manifest V2 and many browsers, like Chrome, no longer support MV2. Before trying to install Xframey, please try using an [alternative](#alternatives) from your web store instead.
 
 ## Installation
 Installing from GitHub is super simple. First, [download the zip](https://github.com/sixcious/xframey/archive/refs/heads/main.zip) and unzip it. Then:
